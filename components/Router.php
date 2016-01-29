@@ -19,19 +19,22 @@ class Router
 
   public function run()
   {
-    // Получить строку запроса
+
     $uri = $this->getUri();
-    // Проверить наличие такого запроса в routes.php
+
     foreach ($this->routes as $uriPattern => $path) {
 
-      if (preg_match("-$uriPattern-", $uri)) {
+      if (preg_match("~$uriPattern~", $uri)) {
 
-        $segments = explode("/", $path);
+        $internalRoute = preg_replace("~$uriPattern~", $path, $uri);
+
+        $segments = explode("/", $internalRoute);
 
         $controllerName = ucfirst(array_shift($segments))."Controller";
+
         $actionName = "action" . ucfirst(array_shift($segments));
 
-        // Если есть совпадение, определить какой контроллер и action обрабатывают запрос
+        $parameters = $segments;
 
         $controllerFile = HOME_DIR . "/controllers/" . $controllerName . ".php";
 
@@ -39,12 +42,8 @@ class Router
           include_once $controllerFile;
         }
 
-        // Подключить файл класс-контроллер
-
-        // Создать объект, вызвать метод
-
         $controllerObject = new $controllerName;
-        $result = $controllerObject->$actionName();
+        $result = call_user_func_array(array($controllerObject, $actionName), $parameters);
         if ($result != null) {
           break;
         }
