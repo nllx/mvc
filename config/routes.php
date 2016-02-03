@@ -1,7 +1,10 @@
-<?php
-
-return array(
-  "news/([a-z]+)/([0-9]+)" => "news/view/$1/$2",
-  "news" => "news/index",
-  "products" => "product/list",
+<?php return array(
+    "/^$/" => "index/index",
+    "/^blog$/" => "index/blog",
+    "/^blog\/page\/([0-9]{1,})/" => "index/getArticleById/$1",
+    "/^blog\/admin$/" => "admin/index/",
+    "/^blog\/admin\/form$/" => "admin/routForm",
+    "/^blog\/admin\/([0-9]{1,})\/edit/" => "admin/editArticleById/$1",
+    "/^blog\/admin\/([0-9]{1,})\/update/" => "admin/updateArticleById/$1",
+    "/^blog\/admin\/([0-9]{1,})\/delete/" => "admin/deleteArticleById/$1",
 );

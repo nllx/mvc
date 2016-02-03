@@ -1,53 +1,80 @@
 <?php
 
+
 class Router
 {
-  private $routes;
 
-  public function __construct()
-  {
-    $routesPath = HOME_DIR . "/config/routes.php";
-    $this->routes = include($routesPath);
-  }
+    private $routes;
+    private $uri;
+    private $controller;
+    private $actionParams;
+    private $controllerFilePath;
 
-  private function getUri()
-  {
-    if (!empty($_SERVER["REQUEST_URI"])) {
-      return trim($_SERVER["REQUEST_URI"], "/");
+    protected function setRoutes()
+    {
+        $this->routes = require_once HOME_DIR . "/config/routes.php";
     }
-  }
 
-  public function run()
-  {
+    protected function setUri()
+    {
+        $this->uri = trim($_SERVER["REQUEST_URI"], "/");
+    }
 
-    $uri = $this->getUri();
+    protected function setController(&$methodSegments)
+    {
+        $this->controller = ucfirst(array_shift($methodSegments)) . "Controller";
+    }
 
-    foreach ($this->routes as $uriPattern => $path) {
+    protected function getAction(&$methodSegments)
+    {
+        return "action" . ucfirst(array_shift($methodSegments));
+    }
 
-      if (preg_match("~$uriPattern~", $uri)) {
+    protected function setActionParams(&$methodSegments)
+    {
+        if (!empty($methodSegments)){
+            $this->actionParams = $methodSegments;
+        } else {
+            $this->actionParams = 0;
+        }
+    }
 
-        $internalRoute = preg_replace("~$uriPattern~", $path, $uri);
+    protected function setControllerFilePath()
+    {
+        $this->controllerFilePath = CONTROLLERS_DIR . $this->controller . ".php";
+    }
 
-        $segments = explode("/", $internalRoute);
+    protected function checkPathController($path){
+        return file_exists($path);
+    }
 
-        $controllerName = ucfirst(array_shift($segments))."Controller";
 
-        $actionName = "action" . ucfirst(array_shift($segments));
+    public function run()
+    {
+        $this->setRoutes();
+        $this->setUri();
 
-        $parameters = $segments;
+        foreach ($this->routes as $uriPattern => $route){
+            if (preg_match($uriPattern, $this->uri)) {
 
-        $controllerFile = HOME_DIR . "/controllers/" . $controllerName . ".php";
+                $method = preg_replace($uriPattern, $route, $this->uri);
+                $methodSegments = explode("/", $method);
 
-        if (file_exists($controllerFile)) {
-          include_once $controllerFile;
+                $this->setController($methodSegments);
+                $action = $this->getAction($methodSegments);
+                $this->setActionParams($methodSegments);
+                $this->setControllerFilePath();
+
+                if ($this->checkPathController($this->controllerFilePath)){
+                    $controller = new $this->controller;
+                    $controller->$action($this->actionParams);
+                }
+                break;
+
+            }
         }
 
-        $controllerObject = new $controllerName;
-        $result = call_user_func_array(array($controllerObject, $actionName), $parameters);
-        if ($result != null) {
-          break;
-        }
-      }
     }
-  }
+
+
 }
