@@ -1,5 +1,6 @@
 <?php
 
+define("HOME_DIR", dirname(__FILE__));
 require_once "components/autoload.php";
 
 class App {
