@@ -1,1 +1,1 @@
-<h1>Test</h1>
+<h1><?php echo $data["key"]; ?></h1>
