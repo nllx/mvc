@@ -1,9 +1,12 @@
 <?php
 
+namespace View;
+
 class View
 {
-    public function render($viewName, $data)
+
+    public function render($viewName, $data = [])
     {
-        require_once VIEWS_DIR . "/" . $viewName . ".php";
+        require_once HOME_DIR . "/views/" . $viewName . ".php";
     }
 }

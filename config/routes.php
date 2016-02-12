@@ -1,5 +1,5 @@
 <?php return array(
-    "/^$/" => "site/test",
+    "/^$/" => "site/index",
     "/^blog$/" => "index/blog",
     "/^blog\/page\/([0-9]{1,})/" => "index/getArticleById/$1",
     "/^blog\/admin$/" => "admin/index/",
