@@ -7,9 +7,16 @@ spl_autoload_register(function($class){
 
     $class .= ".php";
 
+
     switch(true){
         case preg_match("/Router/", $class):
             require_once $class;
+            break;
+        case "Controller\Controller.php" == $class:
+            require_once "Controller.php";
+            break;
+        case "Model\Model.php" == $class:
+            require_once "Model.php";
             break;
         case preg_match("/Controller/", $class):
             require_once HOME_DIR . "/controllers/" . $class;
@@ -22,9 +29,6 @@ spl_autoload_register(function($class){
             break;
         case preg_match("/Db/", $class):
             require_once HOME_DIR . "/config/" . $class;
-            break;
-        default:
-            require_once $class;
             break;
     }
 });
